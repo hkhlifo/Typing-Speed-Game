@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  email        String       @unique
+  passwordHash String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gameResults GameResult[]
+
+  @@index([createdAt])
+}
+
+model GameResult {
+  id                String   @id @default(cuid())
+
+  userId            String
+  completionTime    Float
+  correctCharacters Int
+  wrongAttempts     Int
+  penaltyTime       Float
+  finalTime         Float
+  sequence          String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([finalTime])
+}
