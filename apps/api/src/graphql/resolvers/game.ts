@@ -1,7 +1,4 @@
 import { GraphQLError } from "graphql";
-import { ZodError } from "zod";
-
-import type { GraphQLContext } from "../context";
 
 import {
     getBestScore,
@@ -10,94 +7,75 @@ import {
     saveGameResult,
 } from "../../services/game.service";
 
-function requireUser(context: GraphQLContext): string {
-    if (!context.userId) {
-        throw new GraphQLError("You must be logged in", {
-            extensions: {
-                code: "UNAUTHENTICATED",
-            },
-        });
-    }
-
-    return context.userId;
-}
-
-function handleGameError(error: unknown): never {
-    if (error instanceof ZodError) {
-        throw new GraphQLError("Invalid game result", {
-            extensions: {
-                code: "BAD_USER_INPUT",
-                validationErrors: error.issues.map((issue) => ({
-                    field: issue.path.join("."),
-                    message: issue.message,
-                })),
-            },
-        });
-    }
-
-    if (error instanceof Error) {
-        throw new GraphQLError(error.message, {
-            extensions: {
-                code: "BAD_REQUEST",
-            },
-        });
-    }
-
-    throw new GraphQLError("An unexpected error occurred", {
-        extensions: {
-            code: "INTERNAL_SERVER_ERROR",
-        },
-    });
-}
-
 export const gameResolvers = {
     Query: {
         gameHistory: async (
-            _parent: unknown,
-            _args: unknown,
-            context: GraphQLContext,
+            _: unknown,
+            __: unknown,
+            context: { userId: string | null },
         ) => {
-            const userId = requireUser(context);
+            if (!context.userId) {
+                throw new GraphQLError(
+                    "Authentication required",
+                    {
+                        extensions: {
+                            code: "UNAUTHENTICATED",
+                        },
+                    },
+                );
+            }
 
-            return getGameHistory(userId);
+            return getGameHistory(context.userId);
         },
 
         bestScore: async (
-            _parent: unknown,
-            _args: unknown,
-            context: GraphQLContext,
+            _: unknown,
+            __: unknown,
+            context: { userId: string | null },
         ) => {
-            const userId = requireUser(context);
+            if (!context.userId) {
+                throw new GraphQLError(
+                    "Authentication required",
+                    {
+                        extensions: {
+                            code: "UNAUTHENTICATED",
+                        },
+                    },
+                );
+            }
 
-            return getBestScore(userId);
+            return getBestScore(context.userId);
         },
 
         leaderboard: async (
-            _parent: unknown,
-            args: { limit?: number },
+            _: unknown,
+            { limit }: { limit?: number },
         ) => {
-            const limit = Math.min(Math.max(args.limit ?? 10, 1), 100);
-
             return getLeaderboard(limit);
         },
     },
 
     Mutation: {
         saveGameResult: async (
-            _parent: unknown,
-            args: { input: unknown },
-            context: GraphQLContext,
+            _: unknown,
+            { input }: { input: unknown },
+            context: { userId: string | null },
         ) => {
-            const userId = requireUser(context);
-
-            try {
-                return await saveGameResult(
-                    userId,
-                    args.input,
+            if (!context.userId) {
+                throw new GraphQLError(
+                    "Authentication required",
+                    {
+                        extensions: {
+                            code: "UNAUTHENTICATED",
+                        },
+                    },
                 );
-            } catch (error) {
-                return handleGameError(error);
             }
+
+            return saveGameResult(
+                context.userId,
+                input,
+            );
         },
     },
 };
