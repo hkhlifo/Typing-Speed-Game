@@ -23,6 +23,7 @@ function Navbar() {
                 </Link>
 
                 <div className="flex items-center gap-6 text-sm">
+
                     <Link
                         to="/leaderboard"
                         className="text-slate-300 transition hover:text-white"
@@ -37,6 +38,14 @@ function Navbar() {
                                 className="text-slate-300 transition hover:text-white"
                             >
                                 Play
+                            </Link>
+
+                            {/* ADD THIS */}
+                            <Link
+                                to="/history"
+                                className="text-slate-300 transition hover:text-white"
+                            >
+                                History
                             </Link>
 
                             <button

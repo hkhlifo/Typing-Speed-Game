@@ -17,7 +17,7 @@ export const GET_GAME_HISTORY = gql`
 
 export const GET_MY_BEST_SCORE = gql`
   query GetMyBestScore {
-    myBestScore {
+    bestScore {
       id
       finalTime
       completionTime

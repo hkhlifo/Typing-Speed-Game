@@ -22,6 +22,7 @@ function LeaderboardPage() {
 
       <main className="mx-auto max-w-4xl px-6 py-14">
 
+        {/* Page Header */}
         <div className="text-center">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-blue-400">
             Global Rankings
@@ -37,15 +38,18 @@ function LeaderboardPage() {
           </p>
         </div>
 
+        {/* Leaderboard Content */}
         <div className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
 
+          {/* Loading State */}
           {loading && (
             <div className="p-12 text-center text-slate-400">
               Loading leaderboard...
             </div>
           )}
 
-          {error && (
+          {/* Error State */}
+          {!loading && error && (
             <div className="p-12 text-center">
               <p className="text-red-400">
                 Unable to load the leaderboard.
@@ -57,11 +61,14 @@ function LeaderboardPage() {
             </div>
           )}
 
+          {/* Empty State */}
           {!loading &&
             !error &&
             leaderboard.length === 0 && (
               <div className="p-12 text-center">
-                <div className="text-4xl">🏁</div>
+                <div className="text-4xl">
+                  🏁
+                </div>
 
                 <h2 className="mt-4 text-xl font-semibold">
                   No scores yet
@@ -80,18 +87,28 @@ function LeaderboardPage() {
               </div>
             )}
 
+          {/* Leaderboard */}
           {!loading &&
             !error &&
             leaderboard.length > 0 && (
               <div>
+
+                {/* Table Header */}
                 <div className="grid grid-cols-[70px_1fr_120px] border-b border-white/10 px-6 py-4 text-xs font-medium uppercase tracking-wider text-slate-500">
-                  <span>Rank</span>
-                  <span>Player</span>
+                  <span>
+                    Rank
+                  </span>
+
+                  <span>
+                    Player
+                  </span>
+
                   <span className="text-right">
                     Best Time
                   </span>
                 </div>
 
+                {/* Leaderboard Rows */}
                 {leaderboard.map((entry, index) => {
                   const rank = index + 1;
 
@@ -126,9 +143,9 @@ function LeaderboardPage() {
                 })}
               </div>
             )}
-
         </div>
 
+        {/* Bottom CTA */}
         <div className="mt-10 text-center">
           <Link
             to="/game"
